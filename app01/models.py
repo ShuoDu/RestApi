@@ -15,4 +15,15 @@ class Publisher(models.Model):
         verbose_name_plural = verbose_name
 
 
+class Books(models.Model):
+    title = models.CharField(max_length=32, verbose_name='title')
+    publisher = models.ForeignKey("Publisher", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = "书"
+        verbose_name_plural = verbose_name
+
 

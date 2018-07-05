@@ -11,7 +11,10 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import mixins
 from rest_framework import generics
+from rest_framework import permissions
+from  app01.permissions import  IsOwnerOrReadOnly
 
+from rest_framework.reverse import reverse
 
 '''
  基于方法，用装饰器修饰方法
@@ -152,7 +155,7 @@ def publisher_detail(request, pk, format=None):
 class Publishers( generics.ListCreateAPIView):
     queryset = models.Publisher.objects.all()  # pub_list这个名称是固定的
     serializer_class = serializers.PublisherSerializer  # ser..这个名称也是固定的不能变
-
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)  # 登录之后才能查看
 
 
 # class PublishersDetail( mixins.RetrieveModelMixin,
@@ -175,3 +178,26 @@ class Publishers( generics.ListCreateAPIView):
 class PublishersDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Publisher.objects.all()
     serializer_class = serializers.PublisherSerializer
+    # permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)  # 不是自己录入的智能看不能改
+
+
+# 图书列表
+class Book( generics.ListCreateAPIView):
+    queryset = models.Books.objects.all()  # pub_list这个名称是固定的
+    serializer_class = serializers.BookSerializer  # ser..这个名称也是固定的不能变
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)  # 登录之后才能查看
+
+
+# 图书详情
+class BookDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = models.Books.objects.all()
+    serializer_class = serializers.BookSerializer
+    permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)  # 不是自己录入的智能看不能改
+
+
+@api_view(['GET'])
+def api_root(request, format=None):
+     return Response({
+          'publishers': reverse('publist', request=request, format=format),
+          # 'pubdetail': reverse('pubdetail', request=request, format=format)
+     })
